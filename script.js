@@ -6,6 +6,10 @@ let CTX = dom_canvas.getContext("2d");
 
 const W = (dom_canvas.width = 400);
 const H = (dom_canvas.height = 400);
+const up = document.getElementById("up");
+const down = document.getElementById("down");
+const left = document.getElementById("left");
+const right = document.getElementById("right");
 
 let snake,
   food,
@@ -14,7 +18,7 @@ let snake,
   cellSize,
   isGameOver = false,
   tails = [],
-  score = 00,
+  score = 0o0,
   maxScore = window.localStorage.getItem("maxScore") || undefined,
   particles = [],
   splashingParticleCount = 20,
@@ -208,6 +212,7 @@ class Snake {
     if (KEY.ArrowUp) {
       this.dir = new helpers.Vec(0, -dir);
     }
+
     if (KEY.ArrowDown) {
       this.dir = new helpers.Vec(0, dir);
     }
@@ -331,6 +336,23 @@ function clear() {
   CTX.clearRect(0, 0, W, H);
 }
 
+function handleDirection(direction) {
+  if (direction === "ArrowUp" && !KEY.ArrowDown) {
+    KEY.ArrowUp = true;
+    KEY.ArrowRight = KEY.ArrowLeft = KEY.ArrowDown = false;
+  } else if (direction === "ArrowDown" && !KEY.ArrowUp) {
+    KEY.ArrowDown = true;
+    KEY.ArrowRight = KEY.ArrowLeft = KEY.ArrowUp = false;
+  } else if (direction === "ArrowLeft" && !KEY.ArrowRight) {
+    KEY.ArrowLeft = true;
+    KEY.ArrowUp = KEY.ArrowRight = KEY.ArrowDown = false;
+  } else if (direction === "ArrowRight" && !KEY.ArrowLeft) {
+    KEY.ArrowRight = true;
+    KEY.ArrowUp = KEY.ArrowLeft = KEY.ArrowDown = false;
+  }
+}
+
+
 function initialize() {
   CTX.imageSmoothingEnabled = false;
   KEY.listen();
@@ -339,8 +361,16 @@ function initialize() {
   snake = new Snake();
   food = new Food();
   dom_replay.addEventListener("click", reset, false);
+
+  // Add event listeners for on-screen buttons
+  up.addEventListener("click", () => handleDirection("ArrowUp"));
+  down.addEventListener("click", () => handleDirection("ArrowDown"));
+  left.addEventListener("click", () => handleDirection("ArrowLeft"));
+  right.addEventListener("click", () => handleDirection("ArrowRight"));
+
   loop();
 }
+
 
 function loop() {
   clear();
